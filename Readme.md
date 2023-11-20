@@ -46,3 +46,15 @@ This process is quite complicated by only using `String` and `regex` library cod
 However, if we are in a modern editor like `VS Code`, we can do this by: search by regex, select all text that matches, move cursor to the end of the selections, and type `.h`.
 
 This library is trying to provide a similar API that lets you do that as if you are in a modern editor.
+
+Sample code:
+
+```rs
+fn rep(s: String) -> String {
+  let mut doc = Doc::from(s);
+  doc.select_regex("#include <(.*?)>"); // Select all that matches the regex
+  doc.selections().move_cursor_right(); // Move cursor to the right for each selection
+  doc.cursors().insert(String::from(".h")); // Insert `.h` to all selections
+  doc.content() // Return the content
+}
+```
