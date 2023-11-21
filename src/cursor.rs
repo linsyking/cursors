@@ -1,10 +1,6 @@
-use std::{rc::Rc, cell::RefCell};
-
-use crate::common::{Cursor, Doc};
+use crate::common::Cursor;
+use std::{cell::RefCell, rc::Rc};
 
 impl Cursor {
-    /// Move cursor to next `n` word(s)
-    pub fn word(self, n: usize) -> Self {
-        
-    }
+    
 }
