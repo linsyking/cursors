@@ -92,6 +92,8 @@ pub enum CursorMove {
     CharBackward(usize),
     WordForward(usize),
     WordBackward(usize),
+    VerticalUp(usize),
+    VerticalDown(usize),
     EndOfLine,
     EndOfFile,
 }

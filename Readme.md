@@ -6,7 +6,7 @@ A Rust library that lets you edit `String` like in a modern editor (Vim, VS Code
 
 - Multiple cursors
 - Multiple selections
-- Move semantics for cursors & docs
+- Move semantics for cursors
 - Select by regex
 - Copy, paste, replace semantics
 
@@ -16,9 +16,9 @@ A Rust library that lets you edit `String` like in a modern editor (Vim, VS Code
 - Multi-substring replacement
 - Regex based replacement
 
-It's not convenient to directly manipulate a string by using functions in the `String` module.
+## Examples
 
-For example, consider we have this string:
+### Regex substitution
 
 ```c
 #include <stdlib>
@@ -55,6 +55,37 @@ fn rep(s: String) -> String {
   doc.select_regex_all("#include <(.*?)>"); // Select all that matches the regex
   doc.selections().add_cursor_right(); // Add cursors to the right for each selection
   doc.cursors().insert(String::from(".h")); // Insert `.h` to all selections
+  doc.content() // Return the content
+}
+```
+
+### Insert vertically
+
+```text
+1 + 1 <
+2 + 2 =
+10 + 10 >
+```
+
+We want to add ` ?` to the end of each line, i.e. we expect
+
+```text
+1 + 1 = ?
+2 + 2 = ?
+10 + 10 = ?
+```
+
+Sample code:
+
+```rs
+fn rep(s: String) -> String {
+  let mut doc = Doc::from(s);
+  doc.new_cursor(0); // Create a cursor at the beginning of the string
+  let lines = doc.lines(); // 3
+  doc.cursors().duplicate_down(lines - 1); // Duplicate cursors
+  doc.cursors().move(EndOfLine); // Move to the end
+  // doc.cursors().find_forward("\n"); // Alternative way
+  doc.cursors().insert(String::from(" ?")); // Insert ` ?` to all cursors
   doc.content() // Return the content
 }
 ```
