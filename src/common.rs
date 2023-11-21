@@ -1,63 +1,97 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, marker::PhantomData, rc::Rc};
 
-type Pos = usize;
+pub type Pos = usize;
+pub type DocRef = Rc<RefCell<DocData>>;
+
+pub enum DocMode {}
+
+pub enum CursorMode {}
+
+pub enum SelectionMode {}
 
 #[derive(Debug, Clone)]
-pub struct Doc {
-    content: Rc<RefCell<String>>,
-    cursors: Cursor,
-    selections: Selection,
+pub struct Doc<T> {
+    pub data: DocRef,
+    phantom: PhantomData<T>,
+}
+
+impl Doc<DocMode> {
+    pub fn from(s: String) -> Self {
+        Doc {
+            data: Rc::new(RefCell::new(DocData::from(s))),
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn cursors(&self) -> Doc<CursorMode> {
+        Doc {
+            data: self.data.clone(),
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn selections(&self) -> Doc<SelectionMode> {
+        Doc {
+            data: self.data.clone(),
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl Doc<CursorMode> {
+    pub fn doc(&self) -> Doc<DocMode> {
+        Doc {
+            data: self.data.clone(),
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl Doc<SelectionMode> {
+    pub fn doc(&self) -> Doc<DocMode> {
+        Doc {
+            data: self.data.clone(),
+            phantom: PhantomData,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DocData {
+    pub content: String,
+    pub cursors: Cursor,
+    pub selections: Selection,
 }
 
 #[derive(Debug, Clone)]
 pub struct Cursor {
-    content: Rc<RefCell<String>>,
-    data: Vec<CursorData>,
+    pub data: Vec<CursorData>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct CursorData {
-    pos: Pos,
+pub struct CursorData {
+    pub pos: Pos,
 }
 
 #[derive(Debug, Clone)]
 pub struct Selection {
-    content: Rc<RefCell<String>>,
-    data: Vec<SelectionData>,
+    pub data: Vec<SelectionData>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct SelectionData {
-    l: Pos,
-    r: Pos,
-    cur: CursorData,
+pub struct SelectionData {
+    pub l: Pos,
+    pub r: Pos,
 }
 
-impl Cursor {
-    pub fn from(content: Rc<RefCell<String>>) -> Self {
-        Self {
-            content,
-            data: Vec::new(),
-        }
-    }
-}
-
-impl Selection {
-    pub fn from(content: Rc<RefCell<String>>) -> Self {
-        Self {
-            content,
-            data: Vec::new(),
-        }
-    }
-}
-
-impl Doc {
-    pub fn from(s: String) -> Self {
-        let s_ref = Rc::new(RefCell::new(s));
-        Self {
-            content: s_ref.clone(),
-            cursors: Cursor::from(s_ref.clone()),
-            selections: Selection::from(s_ref),
-        }
-    }
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum CursorMove {
+    StartOfFile,
+    StartOfLine,
+    CharForward(usize),
+    CharBackward(usize),
+    WordForward(usize),
+    WordBackward(usize),
+    EndOfLine,
+    EndOfFile,
 }

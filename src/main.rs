@@ -1,3 +1,6 @@
+use cursors::common::Doc;
+
 fn main() {
-    println!("Hello, world!");
+    let doc = Doc::from(String::from("123"));
+    assert_eq!(doc.content(), String::from("123"));
 }

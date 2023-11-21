@@ -53,7 +53,7 @@ Sample code:
 fn rep(s: String) -> String {
   let mut doc = Doc::from(s);
   doc.select_regex_all("#include <(.*?)>"); // Select all that matches the regex
-  doc.selections().move_cursor_right(); // Move cursor to the right for each selection
+  doc.selections().add_cursor_right(); // Add cursors to the right for each selection
   doc.cursors().insert(String::from(".h")); // Insert `.h` to all selections
   doc.content() // Return the content
 }
