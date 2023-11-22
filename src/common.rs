@@ -76,7 +76,7 @@ pub struct Cursor {
     pub data: Vec<CursorData>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CursorData {
     pub pos: Pos,
 }
@@ -94,7 +94,7 @@ pub struct SelectionData {
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum CursorMove {
-    StartOfFile,
+    StartOfString,
     StartOfLine,
     CharForward(usize),
     CharBackward(usize),
@@ -103,5 +103,5 @@ pub enum CursorMove {
     VerticalUp(usize),
     VerticalDown(usize),
     EndOfLine,
-    EndOfFile,
+    EndOfString,
 }

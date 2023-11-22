@@ -7,8 +7,9 @@ use crate::{
 
 impl Doc<CursorMode> {
     /// Add a new cursor
-    pub fn add_cursor(&self, pos: Pos) {
-        self.data.borrow_mut().cursors.add_cursor(pos)
+    pub fn add_cursor(&self, pos: Pos) -> &Self {
+        self.data.borrow_mut().cursors.add_cursor(pos);
+        self
     }
 
     fn data_ref(&self) -> Ref<DocData> {
@@ -19,14 +20,26 @@ impl Doc<CursorMode> {
         self.data.borrow_mut()
     }
 
-    pub fn move_it(&self, mov: CursorMove) {
+    pub fn move_it(&self, mov: CursorMove) -> &Self {
         let mut data = self.data_mutref();
         let content = &data.content.clone();
         data.cursors.move_it(content, mov);
+        self
+    }
+
+    pub fn insert(&self, string: &str) -> &Self {
+        let doc = &self.data_ref().content.clone();
+        self.data_mutref().cursors.insert(doc, string);
+        self
     }
 
     pub fn len(&self) -> usize {
         self.data_ref().cursors.len()
+    }
+
+    pub fn clear(&self) -> &Self {
+        self.data_mutref().cursors.clear();
+        self
     }
 }
 
@@ -79,6 +92,22 @@ impl Cursor {
         }
     }
 
+    /// Sort cursors and remove duplicates
+    pub fn refresh(&mut self) {
+        self.data.sort();
+        self.data.dedup();
+    }
+
+    pub fn insert(&mut self, doc: &StringRef, string: &str) {
+        self.refresh();
+        let mut offset = 0;
+        for cur in self.data.iter_mut() {
+            cur.add(offset);
+            cur.insert(doc, string);
+            offset += string.len();
+        }
+    }
+
     pub fn clear(&mut self) {
         self.data.clear();
     }
@@ -91,8 +120,8 @@ impl CursorData {
 
     pub fn move_it(&mut self, doc: &StringRef, mov: CursorMove) {
         match mov {
-            CursorMove::StartOfFile => self.pos = 0,
-            CursorMove::EndOfFile => self.pos = doc.borrow().len(),
+            CursorMove::StartOfString => self.pos = 0,
+            CursorMove::EndOfString => self.pos = doc.borrow().len(),
             CursorMove::CharForward(l) => {
                 let new_pos = self.pos + l;
                 validate(new_pos, doc);
@@ -160,5 +189,9 @@ impl CursorData {
 
     pub fn insert_without_move(&self, doc: &StringRef, string: &str) {
         doc.borrow_mut().insert_str(self.pos, string);
+    }
+
+    pub fn add(&mut self, num: Pos) {
+        self.pos += num;
     }
 }

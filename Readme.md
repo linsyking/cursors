@@ -91,3 +91,8 @@ fn rep(s: String) -> String {
   doc.content() // Return the content
 }
 ```
+
+## Problems
+
+- It seems it's not very suitable to implement this by using `Rc<RefCell>` because it has runtime overhead.
+- Maybe we can use macros?
