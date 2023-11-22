@@ -46,24 +46,6 @@ impl<T> Doc<T> {
     }
 }
 
-// impl Doc<CursorMode> {
-//     pub fn doc(&self) -> Doc<DocMode> {
-//         Doc {
-//             data: self.data.clone(),
-//             phantom: PhantomData,
-//         }
-//     }
-// }
-
-// impl Doc<SelectionMode> {
-//     pub fn doc(&self) -> Doc<DocMode> {
-//         Doc {
-//             data: self.data.clone(),
-//             phantom: PhantomData,
-//         }
-//     }
-// }
-
 #[derive(Debug, Clone)]
 pub struct DocData {
     pub content: StringRef,
