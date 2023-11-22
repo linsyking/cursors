@@ -1,11 +1,15 @@
-use crate::common::{Cursor, Doc, DocData, DocMode, Pos, Selection};
+use std::{cell::RefCell, rc::Rc};
 
+use crate::{
+    common::{Cursor, DocData, Pos, Selection},
+    pos::validate,
+};
 
 impl DocData {
     /// Create Doc from a string
     pub fn from(s: String) -> Self {
         Self {
-            content: s,
+            content: Rc::new(RefCell::new(s)),
             cursors: Cursor::new(),
             selections: Selection::new(),
         }
@@ -13,14 +17,12 @@ impl DocData {
 
     /// Get a clone of the string
     pub fn content(&self) -> String {
-        self.content.clone()
+        self.content.borrow().clone()
     }
 
     /// Create a new cursor
     pub fn new_cursor(&mut self, pos: Pos) {
-        if pos > self.content.len() {
-            panic!("Cursor position must not be greater than the lengthe of the string");
-        }
+        validate(pos, self.content.clone());
         self.cursors.add_cursor(pos);
     }
 

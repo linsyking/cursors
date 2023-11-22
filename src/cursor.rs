@@ -1,9 +1,18 @@
-use crate::common::{Cursor, CursorData, CursorMode, CursorMove, Doc, Pos};
+use crate::{
+    common::{Cursor, CursorData, CursorMode, CursorMove, Doc, Pos, StringRef},
+    pos::validate,
+};
 
 impl Doc<CursorMode> {
     /// Add a new cursor
     pub fn add_cursor(&mut self, pos: Pos) {
         self.data.borrow_mut().cursors.add_cursor(pos)
+    }
+
+    pub fn move_it(&self, mov: CursorMove) {
+        let mut data = self.data.borrow_mut();
+        let content = data.content.clone();
+        data.cursors.move_it(content, mov);
     }
 }
 
@@ -18,9 +27,9 @@ impl Cursor {
         self.data.push(CursorData::from(pos));
     }
 
-    pub fn move_it(&mut self, doc: &String, mov: CursorMove) {
+    pub fn move_it(&mut self, doc: StringRef, mov: CursorMove) {
         for cur in self.data.iter_mut() {
-            cur.move_it(doc, mov);
+            cur.move_it(doc.clone(), mov);
         }
     }
 
@@ -34,5 +43,23 @@ impl CursorData {
         Self { pos }
     }
 
-    pub fn move_it(&mut self, doc: &String, mov: CursorMove) {}
+    pub fn move_it(&mut self, doc: StringRef, mov: CursorMove) {
+        match mov {
+            CursorMove::StartOfFile => self.pos = 0,
+            CursorMove::EndOfFile => self.pos = doc.borrow().len(),
+            CursorMove::CharForward(l) => {
+                let new_pos = self.pos + l;
+                validate(new_pos, doc);
+                self.pos = new_pos;
+            }
+            CursorMove::CharBackward(l) => {
+                let new_pos = self.pos - l;
+                validate(new_pos, doc);
+                self.pos = new_pos;
+            }
+            _ => todo!(),
+        }
+    }
+
+    // pub fn find_forward(&mut self, doc: &String)
 }

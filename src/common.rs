@@ -2,6 +2,7 @@ use std::{cell::RefCell, marker::PhantomData, rc::Rc};
 
 pub type Pos = usize;
 pub type DocRef = Rc<RefCell<DocData>>;
+pub type StringRef = Rc<RefCell<String>>;
 
 pub struct DocMode;
 
@@ -65,7 +66,7 @@ impl<T> Doc<T> {
 
 #[derive(Debug, Clone)]
 pub struct DocData {
-    pub content: String,
+    pub content: StringRef,
     pub cursors: Cursor,
     pub selections: Selection,
 }
