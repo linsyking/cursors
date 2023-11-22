@@ -57,35 +57,47 @@ impl CursorData {
                 validate(new_pos, doc);
                 self.pos = new_pos;
             }
+            CursorMove::EndOfLine => {
+                if let Some(pos) = self.find_forward(doc.clone(), "\n") {
+                    self.pos = pos;
+                } else {
+                    // Not found, move to the end of doc
+                    self.pos = doc.borrow().len();
+                }
+            }
+            CursorMove::StartOfLine => {
+                if let Some(pos) = self.find_backward(doc.clone(), "\n") {
+                    self.pos = pos;
+                } else {
+                    // Not found, move to the start of doc
+                    self.pos = 0;
+                }
+            }
             _ => todo!(),
         }
     }
 
-    pub fn find_forward(&mut self, doc: &String, pat: &str) {
-        let pos = doc[self.pos..].find(pat);
-        if let Some(pos) = pos {
-            self.pos += pos;
-        }
+    pub fn find_forward(&mut self, doc: StringRef, pat: &str) -> Option<Pos> {
+        let doc = doc.borrow();
+        let pos = doc[self.pos..].find(pat)?;
+        Some(self.pos + pos)
     }
 
-    pub fn find_forward_more(&mut self, doc: &String, pat: &str) {
-        let pos = doc[self.pos..].find(pat);
-        if let Some(pos) = pos {
-            self.pos += pos + pat.len();
-        }
+    pub fn find_forward_more(&mut self, doc: StringRef, pat: &str) -> Option<Pos> {
+        let doc = doc.borrow();
+        let pos = doc[self.pos..].find(pat)?;
+        Some(self.pos + pos + pat.len())
     }
 
-    pub fn find_backward(&mut self, doc: &String, pat: &str) {
-        let pos = doc[..self.pos].find(pat);
-        if let Some(pos) = pos {
-            self.pos = pos + pat.len();
-        }
+    pub fn find_backward(&mut self, doc: StringRef, pat: &str) -> Option<Pos> {
+        let doc = doc.borrow();
+        let pos = doc[..self.pos].find(pat)?;
+        Some(pos + pat.len())
     }
 
-    pub fn find_backward_more(&mut self, doc: &String, pat: &str) {
-        let pos = doc[..self.pos].rfind(pat);
-        if let Some(pos) = pos {
-            self.pos = pos;
-        }
+    pub fn find_backward_more(&mut self, doc: StringRef, pat: &str) -> Option<Pos> {
+        let doc = doc.borrow();
+        let pos = doc[..self.pos].rfind(pat)?;
+        Some(pos)
     }
 }
