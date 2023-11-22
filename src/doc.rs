@@ -22,7 +22,7 @@ impl DocData {
 
     /// Create a new cursor
     pub fn new_cursor(&mut self, pos: Pos) {
-        validate(pos, self.content.clone());
+        validate(pos, &self.content);
         self.cursors.add_cursor(pos);
     }
 
