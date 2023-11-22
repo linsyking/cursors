@@ -61,5 +61,31 @@ impl CursorData {
         }
     }
 
-    // pub fn find_forward(&mut self, doc: &String)
+    pub fn find_forward(&mut self, doc: &String, pat: &str) {
+        let pos = doc[self.pos..].find(pat);
+        if let Some(pos) = pos {
+            self.pos += pos;
+        }
+    }
+
+    pub fn find_forward_more(&mut self, doc: &String, pat: &str) {
+        let pos = doc[self.pos..].find(pat);
+        if let Some(pos) = pos {
+            self.pos += pos + pat.len();
+        }
+    }
+
+    pub fn find_backward(&mut self, doc: &String, pat: &str) {
+        let pos = doc[..self.pos].find(pat);
+        if let Some(pos) = pos {
+            self.pos = pos + pat.len();
+        }
+    }
+
+    pub fn find_backward_more(&mut self, doc: &String, pat: &str) {
+        let pos = doc[..self.pos].rfind(pat);
+        if let Some(pos) = pos {
+            self.pos = pos;
+        }
+    }
 }
