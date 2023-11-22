@@ -33,9 +33,21 @@ impl Doc<CursorMode> {
     pub fn insert(&self, string: &str) -> &Self {
         let doc = &self.data_ref().content.clone();
         let mut data = self.data_mutref();
+        data.cursors.refresh();
         data.cursors.insert(doc, string);
-        // TODO: need to update selections
+        let new_cursors = data.cursors.data.clone();
         data.selections.refresh();
+        for cur in new_cursors.iter() {
+            let pos = cur.pos - string.len();
+            for sel in data.selections.data.iter_mut() {
+                if sel.r > pos {
+                    sel.r += string.len();
+                    if sel.l > pos {
+                        sel.l += string.len();
+                    }
+                }
+            }
+        }
         self
     }
 
@@ -135,7 +147,6 @@ impl Cursor {
     }
 
     pub fn insert(&mut self, doc: &StringRef, string: &str) {
-        self.refresh();
         let mut offset = 0;
         for cur in self.data.iter_mut() {
             cur.add(offset);
