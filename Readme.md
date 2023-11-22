@@ -31,7 +31,7 @@ int main(){
 }
 ```
 
-We want to replace all headers to `(itself).h`, i.e. we expect the result to be:
+We want to replace all headers with `(header).h`, i.e. we expect the result to be:
 
 ```c
 #include <stdlib.h>
@@ -42,12 +42,12 @@ int main(){
 }
 ```
 
-To do this, we have to first find all sub-strings by regex `#include <(.*?)>`, get their positions and finally add `.h`.
-This process is quite complicated by only using `String` and `regex` library code.
+To do this, we need to first find all sub-strings by regex `#include <(.*?)>`, get their positions and finally add `.h`. Moreover, when handling the first match, we also need to carefully add some offset to the second match.
+This is quite complicated and bug-prone by only using `String` and `regex` library code.
 
 However, if we are in a modern editor like `VS Code`, we can do this by: search by regex, select all text that matches, move cursor to the end of the selections, and type `.h`.
 
-This library is trying to provide a similar API that lets you do that as if you are in a modern editor.
+To do this in an elegant way, we can create some cursors like you as if you are in a modern editor.
 
 Sample code:
 
