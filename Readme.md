@@ -54,10 +54,10 @@ Sample code:
 ```rs
 fn rep(s: String) -> String {
   let mut doc = Doc::from(s);
-  doc.select_regex_all("#include <(.*?)>"); // Select all that matches the regex
-  doc.selections().add_cursor_right(); // Add cursors to the right for each selection
-  doc.cursors().insert(String::from(".h")); // Insert `.h` to all selections
-  doc.content() // Return the content
+  doc.select_regex_all("#include <(.*?)>") // Select all that matches the regex
+    .add_cursor_right() // Add cursors to the right for each selection
+    .insert(".h") // Insert `.h` to all selections
+    .content() // Return the content
 }
 ```
 
@@ -82,16 +82,16 @@ Sample code:
 ```rs
 fn rep(s: String) -> String {
   let mut doc = Doc::from(s);
-  doc.new_cursor(0); // Create a cursor at the beginning of the string
-  let lines = doc.lines(); // 3
-  doc.cursors().duplicate_down(lines - 1); // Duplicate cursors
-  doc.cursors().move_it(EndOfLine); // Move to the end
-  // doc.cursors().find_forward("\n"); // Alternative way
-  doc.cursors().insert(String::from(" ?")); // Insert ` ?` to all cursors
-  doc.content() // Return the content
+  let lines = doc.lines();
+  doc.cursors()
+    .add_cursor(0) // Create a cursor at the beginning of the string
+    .duplicate_down(lines - 1) // Duplicate cursors
+    .move_it(CursorMove::EndOfLine) // Move to the end
+    .insert(String::from(" ?")); // Insert ` ?` to all cursors
+    .content() // Return the content
 }
 ```
 
-## Problems
+## Issues
 
 - It seems it's not very suitable to implement this by using `Rc<RefCell>` because it has runtime overhead.
