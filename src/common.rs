@@ -44,6 +44,27 @@ impl<T> Doc<T> {
     pub fn content(&self) -> String {
         self.data.borrow().content()
     }
+
+    pub fn to_doc(&self) -> Doc<DocMode> {
+        Doc {
+            data: self.data.clone(),
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn to_selections(&self) -> Doc<SelectionMode> {
+        Doc {
+            data: self.data.clone(),
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn to_cursors(&self) -> Doc<CursorMode> {
+        Doc {
+            data: self.data.clone(),
+            phantom: PhantomData,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
