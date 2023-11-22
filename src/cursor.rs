@@ -41,6 +41,30 @@ impl Doc<CursorMode> {
         self.data_mutref().cursors.clear();
         self
     }
+
+    pub fn find_forward(&self, pat: &str) -> &Self {
+        let doc = &self.data_ref().content.clone();
+        self.data_mutref().cursors.find_forward(doc, pat);
+        self
+    }
+
+    pub fn find_forward_more(&self, pat: &str) -> &Self {
+        let doc = &self.data_ref().content.clone();
+        self.data_mutref().cursors.find_forward_more(doc, pat);
+        self
+    }
+
+    pub fn find_backward(&self, pat: &str) -> &Self {
+        let doc = &self.data_ref().content.clone();
+        self.data_mutref().cursors.find_backward(doc, pat);
+        self
+    }
+
+    pub fn find_backward_more(&self, pat: &str) -> &Self {
+        let doc = &self.data_ref().content.clone();
+        self.data_mutref().cursors.find_backward_more(doc, pat);
+        self
+    }
 }
 
 impl Cursor {
@@ -172,7 +196,7 @@ impl CursorData {
 
     pub fn find_backward(&mut self, doc: &StringRef, pat: &str) -> Option<Pos> {
         let doc = doc.borrow();
-        let pos = doc[..self.pos].find(pat)?;
+        let pos = doc[..self.pos].rfind(pat)?;
         Some(pos + pat.len())
     }
 
