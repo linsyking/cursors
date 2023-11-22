@@ -1,7 +1,5 @@
-use std::cell::{Ref, RefMut};
-
 use crate::{
-    common::{Cursor, CursorData, CursorMode, CursorMove, Doc, DocData, Pos, StringRef},
+    common::{Cursor, CursorData, CursorMode, CursorMove, Doc, Pos, SelectionMode, StringRef},
     pos::validate,
 };
 
@@ -12,14 +10,6 @@ impl Doc<CursorMode> {
         self
     }
 
-    fn data_ref(&self) -> Ref<DocData> {
-        self.data.borrow()
-    }
-
-    fn data_mutref(&self) -> RefMut<DocData> {
-        self.data.borrow_mut()
-    }
-
     pub fn move_it(&self, mov: CursorMove) -> &Self {
         let mut data = self.data_mutref();
         let content = &data.content.clone();
@@ -27,9 +17,25 @@ impl Doc<CursorMode> {
         self
     }
 
+    pub fn move_select(&self, mov: CursorMove) -> Doc<SelectionMode> {
+        let mut data = self.data_mutref();
+        let content = &data.content.clone();
+        let old_cur = &data.cursors.data.clone();
+        data.cursors.move_it_raw(content, mov);
+        let cur = &data.cursors.data.clone();
+        for (oc, c) in old_cur.iter().zip(cur) {
+            data.selections.add(oc.pos, c.pos);
+        }
+        data.cursors.refresh();
+        self.selections()
+    }
+
     pub fn insert(&self, string: &str) -> &Self {
         let doc = &self.data_ref().content.clone();
-        self.data_mutref().cursors.insert(doc, string);
+        let mut data = self.data_mutref();
+        data.cursors.insert(doc, string);
+        // TODO: need to update selections
+        data.selections.refresh();
         self
     }
 
@@ -83,6 +89,12 @@ impl Cursor {
     }
 
     pub fn move_it(&mut self, doc: &StringRef, mov: CursorMove) {
+        self.move_it_raw(doc, mov);
+        self.refresh();
+    }
+
+    // No refresh, the length doesn't change
+    fn move_it_raw(&mut self, doc: &StringRef, mov: CursorMove) {
         for cur in self.data.iter_mut() {
             cur.move_it(doc, mov);
         }

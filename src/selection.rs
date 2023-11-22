@@ -15,9 +15,8 @@ impl Doc<SelectionMode> {
         self
     }
 
-    pub fn clear(&self) -> &Self {
-        self.data.borrow_mut().clear();
-        self
+    pub fn len(&self) -> usize {
+        self.data_ref().selections.len()
     }
 }
 
@@ -33,6 +32,15 @@ impl Selection {
 
     pub fn clear(&mut self) {
         self.data.clear();
+    }
+
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+
+    pub fn refresh(&mut self) {
+        self.data.sort();
+        self.data.dedup();
     }
 }
 

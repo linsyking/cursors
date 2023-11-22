@@ -1,4 +1,8 @@
-use std::{cell::RefCell, marker::PhantomData, rc::Rc};
+use std::{
+    cell::{Ref, RefCell, RefMut},
+    marker::PhantomData,
+    rc::Rc,
+};
 
 pub type Pos = usize;
 pub type DocRef = Rc<RefCell<DocData>>;
@@ -24,13 +28,31 @@ impl Doc<DocMode> {
         }
     }
 
-    pub fn cursors(&self) -> Doc<CursorMode> {
+    pub fn selections(&self) -> Doc<SelectionMode> {
         Doc {
             data: self.data.clone(),
             phantom: PhantomData,
         }
     }
 
+    pub fn cursors(&self) -> Doc<CursorMode> {
+        Doc {
+            data: self.data.clone(),
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl Doc<SelectionMode> {
+    pub fn cursors(&self) -> Doc<CursorMode> {
+        Doc {
+            data: self.data.clone(),
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl Doc<CursorMode> {
     pub fn selections(&self) -> Doc<SelectionMode> {
         Doc {
             data: self.data.clone(),
@@ -45,25 +67,19 @@ impl<T> Doc<T> {
         self.data.borrow().content()
     }
 
-    pub fn to_doc(&self) -> Doc<DocMode> {
-        Doc {
-            data: self.data.clone(),
-            phantom: PhantomData,
-        }
+    // pub fn doc(&self) -> Doc<DocMode> {
+    //     Doc {
+    //         data: self.data.clone(),
+    //         phantom: PhantomData,
+    //     }
+    // }
+
+    pub fn data_ref(&self) -> Ref<DocData> {
+        self.data.borrow()
     }
 
-    pub fn to_selections(&self) -> Doc<SelectionMode> {
-        Doc {
-            data: self.data.clone(),
-            phantom: PhantomData,
-        }
-    }
-
-    pub fn to_cursors(&self) -> Doc<CursorMode> {
-        Doc {
-            data: self.data.clone(),
-            phantom: PhantomData,
-        }
+    pub fn data_mutref(&self) -> RefMut<DocData> {
+        self.data.borrow_mut()
     }
 }
 
@@ -89,10 +105,16 @@ pub struct Selection {
     pub data: Vec<SelectionData>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Ord)]
 pub struct SelectionData {
     pub l: Pos,
     pub r: Pos,
+}
+
+impl PartialOrd for SelectionData {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.r.partial_cmp(&other.r)
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
