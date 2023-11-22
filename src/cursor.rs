@@ -1,18 +1,32 @@
+use std::cell::{Ref, RefMut};
+
 use crate::{
-    common::{Cursor, CursorData, CursorMode, CursorMove, Doc, Pos, StringRef},
+    common::{Cursor, CursorData, CursorMode, CursorMove, Doc, DocData, Pos, StringRef},
     pos::validate,
 };
 
 impl Doc<CursorMode> {
     /// Add a new cursor
-    pub fn add_cursor(&mut self, pos: Pos) {
+    pub fn add_cursor(&self, pos: Pos) {
         self.data.borrow_mut().cursors.add_cursor(pos)
     }
 
+    fn data_ref(&self) -> Ref<DocData> {
+        self.data.borrow()
+    }
+
+    fn data_mutref(&self) -> RefMut<DocData> {
+        self.data.borrow_mut()
+    }
+
     pub fn move_it(&self, mov: CursorMove) {
-        let mut data = self.data.borrow_mut();
+        let mut data = self.data_mutref();
         let content = &data.content.clone();
         data.cursors.move_it(content, mov);
+    }
+
+    pub fn len(&self) -> usize {
+        self.data_ref().cursors.len()
     }
 }
 
@@ -20,6 +34,10 @@ impl Cursor {
     /// Create a new Cursor set
     pub fn new() -> Self {
         Self { data: Vec::new() }
+    }
+
+    pub fn len(&self) -> usize {
+        self.data.len()
     }
 
     /// Add a new cursor
@@ -133,5 +151,14 @@ impl CursorData {
         let doc = doc.borrow();
         let pos = doc[..self.pos].rfind(pat)?;
         Some(pos)
+    }
+
+    pub fn insert(&mut self, doc: &StringRef, string: &str) {
+        self.insert_without_move(doc, string);
+        self.pos += string.len();
+    }
+
+    pub fn insert_without_move(&self, doc: &StringRef, string: &str) {
+        doc.borrow_mut().insert_str(self.pos, string);
     }
 }
