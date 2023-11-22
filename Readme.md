@@ -72,9 +72,9 @@ fn rep(s: String) -> String {
 We want to add ` ?` to the end of each line, i.e. we expect
 
 ```text
-1 + 1 = ?
+1 + 1 < ?
 2 + 2 = ?
-10 + 10 = ?
+10 + 10 > ?
 ```
 
 Sample code:
