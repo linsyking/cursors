@@ -1,5 +1,5 @@
 use crate::{
-    common::{Doc, Pos, Selection, SelectionData, SelectionMode},
+    common::{Doc, Pos, Selection, SelectionData, SelectionMode, StringRef},
     pos::validate,
 };
 
@@ -27,7 +27,8 @@ impl Selection {
     }
 
     pub fn add(&mut self, l: Pos, r: Pos) {
-        self.data.push(SelectionData::from(l, r))
+        self.data.push(SelectionData::from(l, r));
+        self.refresh();
     }
 
     pub fn clear(&mut self) {
@@ -47,5 +48,9 @@ impl Selection {
 impl SelectionData {
     pub fn from(l: Pos, r: Pos) -> Self {
         Self { l, r }
+    }
+
+    pub fn replace(&mut self, doc: &StringRef, rep: &str) {
+        doc.borrow_mut().replace_range(self.l..self.r, rep);
     }
 }

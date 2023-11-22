@@ -11,6 +11,7 @@ A Rust library that lets you edit `String` like in a modern editor (Vim, VS Code
 - Move semantics for cursors
 - Select by regex
 - Copy, paste, replace semantics
+- Iterators over selections and cursor
 
 ## Usage scenarios
 
@@ -41,11 +42,9 @@ int main(){
   return 0;
 }
 ```
+It's possible to use the powerful `regex` library to implement this. (`replace_all`)
 
-To do this, we need to first find all sub-strings by regex `#include <(.*?)>`, get their positions and finally add `.h`. Moreover, when handling the first match, we also need to carefully add some offset to the second match.
-This is quite complicated and bug-prone by only using `String` and `regex` library code.
-
-However, if we are in a modern editor like `VS Code`, we can do this by: search by regex, select all text that matches, move cursor to the end of the selections, and type `.h`.
+If we are in a modern editor like `VS Code`, we can do this by: search by regex, select all text that matches, move cursor to the end of the selections, and type `.h`.
 
 To do this in an elegant way, we can create some cursors like you as if you are in a modern editor.
 
@@ -84,7 +83,7 @@ fn rep(s: String) -> String {
   let mut doc = Doc::from(s);
   let lines = doc.lines();
   doc.cursors()
-    .add_cursor(0) // Create a cursor at the beginning of the string
+    .add(0) // Create a cursor at the beginning of the string
     .duplicate_down(lines - 1) // Duplicate cursors
     .move_it(CursorMove::EndOfLine) // Move to the end
     .insert(String::from(" ?")); // Insert ` ?` to all cursors

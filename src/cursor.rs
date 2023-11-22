@@ -6,7 +6,7 @@ use crate::{
 impl Doc<CursorMode> {
     /// Add a new cursor
     pub fn add_cursor(&self, pos: Pos) -> &Self {
-        self.data.borrow_mut().cursors.add_cursor(pos);
+        self.data.borrow_mut().cursors.add(pos);
         self
     }
 
@@ -96,8 +96,9 @@ impl Cursor {
     }
 
     /// Add a new cursor
-    pub fn add_cursor(&mut self, pos: Pos) {
+    pub fn add(&mut self, pos: Pos) {
         self.data.push(CursorData::from(pos));
+        self.refresh();
     }
 
     pub fn move_it(&mut self, doc: &StringRef, mov: CursorMove) {
@@ -117,6 +118,7 @@ impl Cursor {
             let res = cur.find_forward(doc, pat);
             cur.apply_changes(res);
         }
+        self.refresh();
     }
 
     pub fn find_forward_more(&mut self, doc: &StringRef, pat: &str) {
@@ -124,6 +126,7 @@ impl Cursor {
             let res = cur.find_forward_more(doc, pat);
             cur.apply_changes(res);
         }
+        self.refresh();
     }
 
     pub fn find_backward(&mut self, doc: &StringRef, pat: &str) {
@@ -131,6 +134,7 @@ impl Cursor {
             let res = cur.find_backward(doc, pat);
             cur.apply_changes(res);
         }
+        self.refresh();
     }
 
     pub fn find_backward_more(&mut self, doc: &StringRef, pat: &str) {
@@ -138,6 +142,7 @@ impl Cursor {
             let res = cur.find_backward_more(doc, pat);
             cur.apply_changes(res);
         }
+        self.refresh();
     }
 
     /// Sort cursors and remove duplicates
