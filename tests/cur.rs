@@ -3,7 +3,7 @@ mod cursor_tests {
     use cursors::common::{CursorMove, Doc};
 
     #[test]
-    fn cursor_add() {
+    fn add() {
         let mystr = "abc";
         let doc = Doc::from(String::from(mystr));
         assert_eq!(doc.content().as_str(), mystr);
@@ -28,12 +28,16 @@ mod cursor_tests {
     }
 
     #[test]
-    fn cursor_find() {
+    fn find() {
         let mystr = "abc abc def def";
         let doc = Doc::from(String::from(mystr));
         doc.cursors().add_cursor(0).find_forward("def").insert("!");
         assert_eq!(doc.content().as_str(), "abc abc !def def");
         doc.cursors().find_backward("abc").insert("!");
         assert_eq!(doc.content().as_str(), "abc abc! !def def");
+        doc.cursors().find_backward_more(" ").insert("!");
+        assert_eq!(doc.content().as_str(), "abc! abc! !def def");
+        doc.cursors().find_forward_more("!def").insert("!");
+        assert_eq!(doc.content().as_str(), "abc! abc! !def! def");
     }
 }
