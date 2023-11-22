@@ -1,11 +1,5 @@
 use crate::common::{Cursor, Doc, DocData, DocMode, Pos, Selection};
 
-impl Doc<DocMode> {
-    /// Get a clone of the string
-    pub fn content(&self) -> String {
-        self.data.borrow().content()
-    }
-}
 
 impl DocData {
     /// Create Doc from a string

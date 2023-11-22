@@ -3,11 +3,11 @@ use std::{cell::RefCell, marker::PhantomData, rc::Rc};
 pub type Pos = usize;
 pub type DocRef = Rc<RefCell<DocData>>;
 
-pub enum DocMode {}
+pub struct DocMode;
 
-pub enum CursorMode {}
+pub struct CursorMode;
 
-pub enum SelectionMode {}
+pub struct SelectionMode;
 
 #[derive(Debug, Clone)]
 pub struct Doc<T> {
@@ -38,23 +38,30 @@ impl Doc<DocMode> {
     }
 }
 
-impl Doc<CursorMode> {
-    pub fn doc(&self) -> Doc<DocMode> {
-        Doc {
-            data: self.data.clone(),
-            phantom: PhantomData,
-        }
+impl<T> Doc<T> {
+    /// Get a clone of the string
+    pub fn content(&self) -> String {
+        self.data.borrow().content()
     }
 }
 
-impl Doc<SelectionMode> {
-    pub fn doc(&self) -> Doc<DocMode> {
-        Doc {
-            data: self.data.clone(),
-            phantom: PhantomData,
-        }
-    }
-}
+// impl Doc<CursorMode> {
+//     pub fn doc(&self) -> Doc<DocMode> {
+//         Doc {
+//             data: self.data.clone(),
+//             phantom: PhantomData,
+//         }
+//     }
+// }
+
+// impl Doc<SelectionMode> {
+//     pub fn doc(&self) -> Doc<DocMode> {
+//         Doc {
+//             data: self.data.clone(),
+//             phantom: PhantomData,
+//         }
+//     }
+// }
 
 #[derive(Debug, Clone)]
 pub struct DocData {

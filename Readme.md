@@ -2,6 +2,8 @@
 
 A Rust library that lets you edit `String` like in a modern editor (Vim, VS Code, etc.)
 
+:fire: WIP :fire:
+
 ## Features to support
 
 - Multiple cursors
@@ -83,7 +85,7 @@ fn rep(s: String) -> String {
   doc.new_cursor(0); // Create a cursor at the beginning of the string
   let lines = doc.lines(); // 3
   doc.cursors().duplicate_down(lines - 1); // Duplicate cursors
-  doc.cursors().move(EndOfLine); // Move to the end
+  doc.cursors().move_it(EndOfLine); // Move to the end
   // doc.cursors().find_forward("\n"); // Alternative way
   doc.cursors().insert(String::from(" ?")); // Insert ` ?` to all cursors
   doc.content() // Return the content
